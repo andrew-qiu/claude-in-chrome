@@ -29,8 +29,8 @@ Claude Code（任意模型） ──stdio MCP──▶ server/（Claude Code 所
 ```
 
 MCP server 跑在 **Claude Code 所在的机器**上，native host 跑在 **Chrome 所在的机器**上，
-二者 TCP 相连。四层转发架构（扩展 ↔ host ↔ TCP ↔ MCP server）逆向自 Claude Code
-v2.1.291 官方实现，细节见 [REVERSE-ENGINEERING.md](REVERSE-ENGINEERING.md)。
+二者 TCP 相连。四层转发架构（扩展 ↔ host ↔ TCP ↔ MCP server）参考了 Claude Code
+官方 `/chrome` 的公开行为与协议设计。
 
 ## 安装（执行一次）
 
@@ -63,7 +63,7 @@ bash install.sh
 3. 完全退出并重启 Chrome
 4. 重启 Claude Code 会话，调用 `browser_status` 验证连接
 
-## 工具面（13 个）
+## 工具面（22 个）
 
 | 工具 | 说明 |
 |---|---|
