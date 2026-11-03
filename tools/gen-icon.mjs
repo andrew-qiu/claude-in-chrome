@@ -1,4 +1,4 @@
-// chrome-bridge 扩展图标生成器（零第三方依赖：node 自带 zlib 手写 PNG）
+// claude-in-chrome 扩展图标生成器（零第三方依赖：node 自带 zlib 手写 PNG）
 // 设计：深炭底圆角方 + 橙色星芒（Claude 品牌色系 #D97757）+ 中心微光晕
 // 用法：node tools/gen-icon.mjs   →  extension/icons/icon{16,32,48,128}.png
 import { deflateSync } from "node:zlib";

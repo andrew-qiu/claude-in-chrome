@@ -1,23 +1,25 @@
 #!/usr/bin/env node
-// chrome-bridge MCP 服务器
+// claude-in-chrome MCP 服务器
 // - stdio: 对 Claude Code 讲 MCP（JSON-RPC 2.0）
 // - TCP 127.0.0.1:8765: 接收 Windows host.exe 的反向连接（WSL localhostForwarding）
 //
-// 环境变量:
-//   CHROME_BRIDGE_HOST  TCP 监听地址（默认 127.0.0.1；镜像网络模式下可用 0.0.0.0）
-//   CHROME_BRIDGE_PORT  TCP 端口（默认 8765）
-//   CHROME_BRIDGE_TOOL_TIMEOUT_MS  工具调用超时（默认 90000，同官方 browser_batch）
+// 环境变量（旧名 CHROME_BRIDGE_* 仍回退支持，方便存量部署平滑升级）:
+//   CLAUDE_IN_CHROME_HOST  TCP 监听地址（默认 127.0.0.1；镜像网络模式下可用 0.0.0.0）
+//   CLAUDE_IN_CHROME_PORT  TCP 端口（默认 8765）
+//   CLAUDE_IN_CHROME_TOOL_TIMEOUT_MS  工具调用超时（默认 90000，同官方 browser_batch）
 
 import net from "net";
 import { encodeFrame, FrameDecoder, msg } from "../lib/protocol.js";
 
-const HOST = process.env.CHROME_BRIDGE_HOST ?? "127.0.0.1";
-const PORT = Number(process.env.CHROME_BRIDGE_PORT ?? 8765);
-const TOOL_TIMEOUT = Number(process.env.CHROME_BRIDGE_TOOL_TIMEOUT_MS ?? 90000);
+const HOST = process.env.CLAUDE_IN_CHROME_HOST ?? process.env.CHROME_BRIDGE_HOST ?? "127.0.0.1";
+const PORT = Number(process.env.CLAUDE_IN_CHROME_PORT ?? process.env.CHROME_BRIDGE_PORT ?? 8765);
+const TOOL_TIMEOUT = Number(
+  process.env.CLAUDE_IN_CHROME_TOOL_TIMEOUT_MS ?? process.env.CHROME_BRIDGE_TOOL_TIMEOUT_MS ?? 90000,
+);
 const PROTOCOL_VERSION = "2025-06-18";
-const SERVER_INFO = { name: "chrome-bridge", version: "0.3.0" };
+const SERVER_INFO = { name: "claude-in-chrome", version: "0.3.0" };
 
-const log = (...a) => console.error("[chrome-bridge]", ...a);
+const log = (...a) => console.error("[claude-in-chrome]", ...a);
 
 // ---------------------------------------------------------------------------
 // 工具面（对模型暴露）
@@ -26,7 +28,7 @@ const TOOLS = [
   {
     name: "browser_status",
     description:
-      "Check chrome-bridge connection status: whether the browser extension is connected, " +
+      "Check claude-in-chrome connection status: whether the browser extension is connected, " +
       "which browser/user agent it reports, and host version. Call this first when browser " +
       "tools fail or before starting a browser workflow.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
@@ -471,7 +473,7 @@ async function callTool(tool, args) {
   if (!hostConn || hostConn.destroyed) {
     throw new Error(
       "Browser extension is not connected. Ensure Chrome is running with the " +
-        "chrome-bridge extension loaded (chrome://extensions → Load unpacked → the " +
+        "claude-in-chrome extension loaded (chrome://extensions → Load unpacked → the " +
         "deployed extension dir shown by install.sh) and that install.sh finished. Then retry browser_status."
     );
   }
@@ -535,7 +537,7 @@ async function handleRpc(req) {
           ? `not connected — ${dormant}`
           : hostConn
             ? `connected: ${JSON.stringify(hostInfo)}`
-            : "not connected — waiting for host.exe (Windows Chrome with chrome-bridge extension). " +
+            : "not connected — waiting for host.exe (Windows Chrome with claude-in-chrome extension). " +
               "Run install.sh and reload the extension, then retry.";
         return rpcResult(id, { content: [{ type: "text", text }] });
       }
@@ -618,7 +620,7 @@ tcpServer.on("error", (e) => {
   if (evictAttempts > 20) {
     dormant =
       `port ${PORT} is held by another process that did not yield to eviction ` +
-      `(likely an old chrome-bridge server). Free the port or /mcp reconnect later.`;
+      `(likely an old claude-in-chrome server). Free the port or /mcp reconnect later.`;
     log(dormant);
     return;
   }

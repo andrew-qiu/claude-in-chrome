@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Claude-in-Chrome",
   "version": "0.3.0",
-  "description": "Browser control bridge for AI coding agents (third-party-model friendly /chrome equivalent). Connects your daily browser to the chrome-bridge MCP server via native messaging.",
+  "description": "Browser control bridge for AI coding agents (third-party-model friendly /chrome equivalent). Connects your daily browser to the claude-in-chrome MCP server via native messaging.",
   "permissions": ["debugger", "tabs", "tabGroups", "nativeMessaging", "storage"],
   "background": { "service_worker": "background.js" },
   "action": {

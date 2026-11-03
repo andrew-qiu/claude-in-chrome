@@ -1,11 +1,11 @@
-// chrome-bridge 扩展 service worker
+// claude-in-chrome 扩展 service worker
 // 上行: chrome.runtime.connectNative → host.exe → TCP → MCP server
 // 下行: chrome.debugger (CDP) 控制标签页
 //
 // 协议帧（经 native messaging，每条 postMessage 即一帧）:
 //   hello / ping / pong / tool_request{id,tool,args} / tool_response{id,ok,result|error}
 
-const HOST_NAME = "com.user.chrome_bridge";
+const HOST_NAME = "com.user.claude_in_chrome";
 const RECONNECT_MS = 5000;
 const BUF_SIZE = 200; // console/network 环形缓冲条数
 const NAV_TIMEOUT = 20000;
@@ -96,7 +96,7 @@ async function dispatchTool(id, tool, args) {
           type: "tool_response",
           id,
           ok: false,
-          error: `site not allowed by chrome-bridge options: ${url} (open the extension options to allow it)`,
+          error: `site not allowed by claude-in-chrome options: ${url} (open the extension options to allow it)`,
         };
       }
     }

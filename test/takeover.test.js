@@ -16,7 +16,7 @@ const procs = [];
 
 function startServer(port) {
   const p = spawn(process.execPath, [path.join(ROOT, "server/index.js")], {
-    env: { ...process.env, CHROME_BRIDGE_PORT: String(port) },
+    env: { ...process.env, CLAUDE_IN_CHROME_PORT: String(port) },
     stdio: ["pipe", "pipe", "pipe"],
   });
   procs.push(p);

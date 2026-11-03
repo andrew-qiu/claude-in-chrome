@@ -1,4 +1,4 @@
-// chrome-bridge Windows Native Messaging Host
+// claude-in-chrome Windows Native Messaging Host
 // 职责：纯帧中继 —— Chrome native messaging (stdin/stdout, 4B LE 长度前缀 + JSON)
 //       ↔ TCP (默认 localhost:8765 → WSL2 的 MCP server, 经 WSL localhostForwarding)
 //
@@ -29,11 +29,13 @@ function parseArgs() {
     else if (args[i] === "--bridge-port") { out.port = Number(args[++i]); portGiven = true; }
     else if (args[i] === "--selftest") out.selftest = true;
   }
-  // 环境变量仅补充未显式给定的参数（否则用户级 setx 的 CHROME_BRIDGE_ADDR
+  // 环境变量仅补充未显式给定的参数（否则用户级 setx 的 CLAUDE_IN_CHROME_ADDR
   // 会覆盖 CLI 传参——selftest 指定端口时会连到错误地址）。manifest "path"
-  // 只能是 exe 路径，所以运行态地址仍经环境变量由 install.sh 写入系统
-  if (process.env.CHROME_BRIDGE_ADDR) {
-    const [h, p] = process.env.CHROME_BRIDGE_ADDR.split(":");
+  // 只能是 exe 路径，所以运行态地址仍经环境变量由 install.sh 写入系统。
+  // 旧名 CHROME_BRIDGE_ADDR 回退支持：存量 Windows 部署 setx 的还是旧名。
+  const addrEnv = process.env.CLAUDE_IN_CHROME_ADDR ?? process.env.CHROME_BRIDGE_ADDR;
+  if (addrEnv) {
+    const [h, p] = addrEnv.split(":");
     if (h && !hostGiven) out.host = h;
     if (p && !portGiven) out.port = Number(p);
   }
@@ -44,7 +46,7 @@ const cfg = parseArgs();
 
 const LOG_PATH = join(dirname(process.execPath), "host.log");
 function log(msg: string) {
-  const line = `[${new Date().toISOString()}] [chrome-bridge host] ${msg}\n`;
+  const line = `[${new Date().toISOString()}] [claude-in-chrome host] ${msg}\n`;
   try {
     appendFileSync(LOG_PATH, line);
   } catch {}
