@@ -1,0 +1,47 @@
+# 自动打包 Chrome 扩展：
+# - push 到 main：跑测试 + 打 zip 上传为构建产物（Artifacts）
+# - 推送 v* 标签：测试 + 打 zip + 创建 GitHub Release 供用户下载
+name: build-extension
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run tests
+        run: node --test test/
+
+      - name: Regenerate icons (reproducible build check)
+        run: node tools/gen-icon.mjs && git diff --exit-code -- extension/icons/
+
+      - name: Package extension
+        run: |
+          cd extension
+          zip -r "../claude-in-chrome-extension.zip" .
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-in-chrome-extension
+          path: claude-in-chrome-extension.zip
+
+      - name: Create release (tags only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: claude-in-chrome-extension.zip
+          generate_release_notes: true
