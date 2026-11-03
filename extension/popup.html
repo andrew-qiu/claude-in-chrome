@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    body { font: 13px system-ui, sans-serif; width: 260px; margin: 8px; }
+    .ok { color: #1a7f37; }
+    .bad { color: #cf222e; }
+    button { margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div><strong>Claude-in-Chrome</strong></div>
+  <div id="status" class="bad">checking…</div>
+  <div id="hostinfo" style="opacity:.7;font-size:11px;margin-top:4px"></div>
+  <button id="reconnect">Reconnect</button>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

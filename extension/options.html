@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Claude-in-Chrome options</title>
+  <style>
+    body { font: 14px system-ui, sans-serif; max-width: 560px; margin: 24px auto; }
+    textarea { width: 100%; height: 140px; font: 12px monospace; }
+    .hint { opacity: .7; font-size: 12px; }
+    button { margin-top: 8px; }
+    .saved { color: #1a7f37; }
+  </style>
+</head>
+<body>
+  <h2>Claude-in-Chrome 站点允许清单</h2>
+  <p class="hint">
+    每行一个规则：<code>*</code> 允许全部（默认，本机自用）；<code>example.com</code>
+    允许该域及子域；<code>localhost:3000</code>、<code>*.internal</code> 等也支持。
+    navigate / click / type / js 工具仅对允许的站点生效（只读工具不受限）。
+  </p>
+  <textarea id="sites"></textarea>
+  <button id="save">Save</button> <span id="msg" class="saved"></span>
+  <script>
+    const el = document.getElementById("sites");
+    chrome.storage.local.get({ allowedSites: ["*"] }, ({ allowedSites }) => {
+      el.value = allowedSites.join("\n");
+    });
+    document.getElementById("save").onclick = () => {
+      const allowedSites = el.value.split("\n").map((s) => s.trim()).filter(Boolean);
+      if (allowedSites.length === 0) allowedSites.push("*");
+      chrome.storage.local.set({ allowedSites }, () => {
+        document.getElementById("msg").textContent = "saved ✓";
+        setTimeout(() => (document.getElementById("msg").textContent = ""), 1500);
+      });
+    };
+  </script>
+</body>
+</html>
